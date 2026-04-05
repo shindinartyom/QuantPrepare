@@ -56,6 +56,14 @@ class Problem(models.Model):
     
     def get_absolute_url(self):
         return reverse('problems:problem_detail', args=[str(self.id)])
+        
+    @property
+    def success_rate(self):
+        total = self.attempts.count()
+        if total == 0:
+            return 0
+        correct = self.attempts.filter(is_correct=True).count()
+        return round((correct / total) * 100, 1)
 
 class Attempt(models.Model):
     problem = models.ForeignKey(
