@@ -47,10 +47,8 @@
                     <div class="mb-4">
                         <label class="form-label">{{ form.tags_input.label }}</label>
                         <div class="form-control d-flex flex-wrap align-items-center" id="tagsContainer" style="min-height: 48px; background-color: rgba(0,0,0,0.2);">
-                            <!-- Dynamic tags will appear here -->
-                            <input type="text" id="fakeTagInput" class="border-0 bg-transparent text-light ms-1" style="outline: none; flex-grow: 1;" placeholder="Type tag and press Enter...">
+                            <input type="text" id="fakeTagInput" class="border-0 bg-transparent text-light ms-1" style="outline: none; flex-grow: 1;" placeholder="Type theme and press Enter...">
                         </div>
-                        <!-- Hidden input to store actual tags for django form -->
                         <input type="hidden" name="tags_input" id="id_tags_input" value="{{ form.tags_input.value|default:'' }}">
                     </div>
 
@@ -70,14 +68,12 @@ document.addEventListener('DOMContentLoaded', () => {
     const container = document.getElementById('tagsContainer');
     let tags = [];
 
-    // init tags
     if (hiddenInput.value) {
         tags = hiddenInput.value.split(/\s+/).filter(t => t.trim() !== '');
         renderTags();
     }
 
     function renderTags() {
-        // remove existing visuals
         container.querySelectorAll('.badge').forEach(e => e.remove());
         tags.forEach((tag, index) => {
             const badge = document.createElement('span');
@@ -112,7 +108,6 @@ document.addEventListener('DOMContentLoaded', () => {
         }
     });
 
-    // Handle form submit just to double check
     document.getElementById('problemForm').addEventListener('submit', () => {
         const val = fakeInput.value.trim().toLowerCase();
         if (val && !tags.includes(val)) {

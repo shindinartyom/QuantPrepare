@@ -8,6 +8,31 @@
     <a href="{% url 'problems:problem_create' %}" class="btn btn-primary">+ Post a Problem</a>
 </div>
 
+<div class="card p-3 mb-4">
+    <form method="get" class="row g-3 align-items-end">
+        <div class="col-md-4">
+            <label class="form-label text-muted small">Search Problem Title</label>
+            <input type="text" name="search" class="form-control border-secondary" placeholder="e.g. integral" value="{{ search }}">
+        </div>
+        <div class="col-md-3">
+            <label class="form-label text-muted small">Filter by Difficulty</label>
+            <select name="difficulty" class="form-select border-secondary">
+                <option value="">Any</option>
+                <option value="easy" {% if difficulty == 'easy' %}selected{% endif %}>Easy</option>
+                <option value="medium" {% if difficulty == 'medium' %}selected{% endif %}>Medium</option>
+                <option value="hard" {% if difficulty == 'hard' %}selected{% endif %}>Hard</option>
+            </select>
+        </div>
+        <div class="col-md-3">
+            <label class="form-label text-muted small">Filter by Theme</label>
+            <input type="text" name="theme" class="form-control border-secondary" placeholder="e.g. math" value="{{ theme }}">
+        </div>
+        <div class="col-md-2">
+            <button type="submit" class="btn btn-primary w-100">Apply Filters</button>
+        </div>
+    </form>
+</div>
+
 <div class="row">
     {% for problem in problems %}
     <div class="col-md-6 mb-4">
@@ -40,7 +65,7 @@
     </div>
     {% empty %}
     <div class="col-12 text-center py-5">
-        <h4 class="text-muted">No problems available. Be the first to post one!</h4>
+        <h4 class="text-muted">No problems available.</h4>
     </div>
     {% endfor %}
 </div>
@@ -49,13 +74,13 @@
 <nav aria-label="Page navigation" class="mt-4">
     <ul class="pagination justify-content-center">
         {% if page_obj.has_previous %}
-        <li class="page-item"><a class="page-link bg-dark text-light border-0" href="?page={{ page_obj.previous_page_number }}">Previous</a></li>
+        <li class="page-item"><a class="page-link bg-dark text-light border-0" href="?page={{ page_obj.previous_page_number }}{% if search %}&search={{ search }}{% endif %}{% if difficulty %}&difficulty={{ difficulty }}{% endif %}{% if theme %}&theme={{ theme }}{% endif %}">Previous</a></li>
         {% endif %}
         
         <li class="page-item disabled"><a class="page-link bg-dark text-light border-0" href="#">Page {{ page_obj.number }} of {{ page_obj.paginator.num_pages }}</a></li>
         
         {% if page_obj.has_next %}
-        <li class="page-item"><a class="page-link bg-dark text-light border-0" href="?page={{ page_obj.next_page_number }}">Next</a></li>
+        <li class="page-item"><a class="page-link bg-dark text-light border-0" href="?page={{ page_obj.next_page_number }}{% if search %}&search={{ search }}{% endif %}{% if difficulty %}&difficulty={{ difficulty }}{% endif %}{% if theme %}&theme={{ theme }}{% endif %}">Next</a></li>
         {% endif %}
     </ul>
 </nav>

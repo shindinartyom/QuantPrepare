@@ -5,10 +5,10 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 class ProblemForm(forms.ModelForm):
     tags_input = forms.CharField(
         required=False,
-        label='Tags',
+        label='Themes',
         widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'placeholder': 'Enter tags separated by space or comma...'
+            'placeholder': 'Enter themes separated by space or comma...'
         })
     )
 
@@ -18,7 +18,7 @@ class ProblemForm(forms.ModelForm):
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
-                'placeholder': 'e.g. Calculate the integral'
+                'placeholder': 'e.g. Calculate the probability'
             }),
             'description': forms.Textarea(attrs={
                 'class': 'form-control',
@@ -52,12 +52,11 @@ class ProblemForm(forms.ModelForm):
         return answer
 
 class AnswerForm(forms.Form):
-    user_answer = forms.FloatField(
+    user_answer = forms.CharField(
         label='Your Answer',
-        validators=[MinValueValidator(-1000000), MaxValueValidator(1000000)],
-        widget=forms.NumberInput(attrs={
+        max_length=100,
+        widget=forms.TextInput(attrs={
             'class': 'form-control',
-            'step': 'any',
-            'placeholder': 'Enter a number'
+            'placeholder': 'Enter a number or fraction (e.g. 1/211)'
         })
     )
