@@ -131,3 +131,7 @@ MESSAGE_TAGS = {
     messages.WARNING: 'warning',
     messages.ERROR: 'danger',
 }
+
+LOGIN_URL = 'login'
+LOGIN_REDIRECT_URL = 'problems:problem_list'
+LOGOUT_REDIRECT_URL = 'problems:index'
