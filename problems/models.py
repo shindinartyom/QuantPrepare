@@ -1,32 +1,50 @@
 from django.db import models
 from django.urls import reverse
 from django.core.validators import MinValueValidator, MaxValueValidator
+from django.contrib.auth.models import User
+
+class Tag(models.Model):
+    name = models.CharField('Tag Name', max_length=50, unique=True)
+    
+    class Meta:
+        verbose_name = 'Tag'
+        verbose_name_plural = 'Tags'
+        
+    def __str__(self):
+        return self.name
 
 class Problem(models.Model):
     DIFFICULTY_CHOICES = [
-        ('easy', 'Легкая'),
-        ('medium', 'Средняя'),
-        ('hard', 'Сложная'),
+        ('easy', 'Easy'),
+        ('medium', 'Medium'),
+        ('hard', 'Hard'),
     ]
     
-    title = models.CharField('Название', max_length=200)
-    description = models.TextField('Условие задачи')
+    title = models.CharField('Title', max_length=200)
+    description = models.TextField('Problem Description')
     correct_answer = models.FloatField(
-        'Правильный ответ',
+        'Correct Answer',
         validators=[MinValueValidator(-1000000), MaxValueValidator(1000000)]
     )
     difficulty = models.CharField(
-        'Сложность',
+        'Difficulty',
         max_length=10,
         choices=DIFFICULTY_CHOICES,
         default='medium'
     )
-    created_at = models.DateTimeField('Дата создания', auto_now_add=True)
+    created_at = models.DateTimeField('Creation Date', auto_now_add=True)
+    author = models.ForeignKey(
+        User, 
+        on_delete=models.CASCADE, 
+        related_name='problems', 
+        verbose_name='Author'
+    )
+    tags = models.ManyToManyField(Tag, blank=True, verbose_name='Tags')
     
     class Meta:
         ordering = ['-created_at']
-        verbose_name = 'Задача'
-        verbose_name_plural = 'Задачи'
+        verbose_name = 'Problem'
+        verbose_name_plural = 'Problems'
     
     def __str__(self):
         return self.title
@@ -39,16 +57,22 @@ class Attempt(models.Model):
         Problem,
         on_delete=models.CASCADE,
         related_name='attempts',
-        verbose_name='Задача'
+        verbose_name='Problem'
     )
-    user_answer = models.FloatField('Ответ пользователя')
-    is_correct = models.BooleanField('Правильно?', default=False)
-    timestamp = models.DateTimeField('Время попытки', auto_now_add=True)
+    user = models.ForeignKey(
+        User,
+        on_delete=models.CASCADE,
+        related_name='attempts',
+        verbose_name='User'
+    )
+    user_answer = models.FloatField('User Answer')
+    is_correct = models.BooleanField('Is correct?', default=False)
+    timestamp = models.DateTimeField('Attempt Timestamp', auto_now_add=True)
     
     class Meta:
         ordering = ['-timestamp']
-        verbose_name = 'Попытка'
-        verbose_name_plural = 'Попытки'
+        verbose_name = 'Attempt'
+        verbose_name_plural = 'Attempts'
     
     def __str__(self):
-        return f"{self.problem.title} - {'✓' if self.is_correct else '✗'}"
+        return f"{self.user.username} - {self.problem.title} - {'✓' if self.is_correct else '✗'}"
