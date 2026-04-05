@@ -4,11 +4,11 @@ from django.core.validators import MinValueValidator, MaxValueValidator
 from django.contrib.auth.models import User
 
 class Tag(models.Model):
-    name = models.CharField('Tag Name', max_length=50, unique=True)
+    name = models.CharField('Theme Name', max_length=50, unique=True)
     
     class Meta:
-        verbose_name = 'Tag'
-        verbose_name_plural = 'Tags'
+        verbose_name = 'Theme'
+        verbose_name_plural = 'Themes'
         
     def __str__(self):
         return self.name
@@ -44,7 +44,7 @@ class Problem(models.Model):
         related_name='problems', 
         verbose_name='Author'
     )
-    tags = models.ManyToManyField(Tag, blank=True, verbose_name='Tags')
+    tags = models.ManyToManyField(Tag, blank=True, verbose_name='Themes')
     
     class Meta:
         ordering = ['-created_at']
@@ -52,7 +52,7 @@ class Problem(models.Model):
         verbose_name_plural = 'Problems'
     
     def __str__(self):
-        return self.title
+        return str(self.title)
     
     def get_absolute_url(self):
         return reverse('problems:problem_detail', args=[str(self.id)])
@@ -70,7 +70,7 @@ class Attempt(models.Model):
         related_name='attempts',
         verbose_name='User'
     )
-    user_answer = models.FloatField('User Answer')
+    user_answer = models.CharField('User Answer', max_length=100)
     is_correct = models.BooleanField('Is correct?', default=False)
     timestamp = models.DateTimeField('Attempt Timestamp', auto_now_add=True)
     
