@@ -2,8 +2,8 @@ from django.shortcuts import redirect
 from django.contrib import messages
 from django.urls import reverse_lazy
 from django.views.generic import ListView, DetailView, CreateView
-from django.views.generic import TemplateView
-from django.contrib.auth.mixins import LoginRequiredMixin
+from django.views.generic import TemplateView, UpdateView, DeleteView
+from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 from django.contrib.auth.forms import UserCreationForm
 from .models import Problem, Attempt, Tag
 from .forms import ProblemForm, AnswerForm
@@ -158,9 +158,6 @@ class StatisticsView(LoginRequiredMixin, TemplateView):
         context['theme'] = tag_q
         
         return context
-
-from django.contrib.auth.mixins import UserPassesTestMixin
-from django.views.generic import UpdateView, DeleteView
 
 class ProblemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
     model = Problem
