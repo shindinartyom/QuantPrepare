@@ -14,7 +14,7 @@ class ProblemForm(forms.ModelForm):
 
     class Meta:
         model = Problem
-        fields = ['title', 'description', 'correct_answer', 'difficulty']
+        fields = ['title', 'description', 'correct_answer', 'tolerance', 'difficulty']
         widgets = {
             'title': forms.TextInput(attrs={
                 'class': 'form-control',
@@ -30,12 +30,18 @@ class ProblemForm(forms.ModelForm):
                 'step': 'any',
                 'placeholder': 'Enter a number'
             }),
+            'tolerance': forms.NumberInput(attrs={
+                'class': 'form-control',
+                'step': 'any',
+                'placeholder': 'e.g. 0.01'
+            }),
             'difficulty': forms.Select(attrs={'class': 'form-select'}),
         }
         labels = {
             'title': 'Problem Title',
             'description': 'Description',
             'correct_answer': 'Correct Answer (Number)',
+            'tolerance': 'Tolerance (margin of error)',
             'difficulty': 'Difficulty',
         }
     

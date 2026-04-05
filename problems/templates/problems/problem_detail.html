@@ -4,7 +4,7 @@
 {% block title %}{{ problem.title }} - QuantPrepare{% endblock %}
 
 {% block content %}
-<div class="row">
+<div class="row justify-content-center">
     <div class="col-lg-8 mb-4">
         <div class="card p-3">
             <div class="card-header d-flex justify-content-between align-items-center">
@@ -32,53 +32,35 @@
                     <p class="mb-0" style="font-size: 1.1rem; line-height: 1.6;">{{ problem.description|linebreaksbr }}</p>
                 </div>
 
-                {% if user == problem.author %}
                 <div class="mt-4 pt-3 border-top border-secondary">
-                    <a href="{% url 'problems:problem_update' problem.id %}" class="btn btn-warning btn-sm me-2">Edit</a>
-                    <a href="{% url 'problems:problem_delete' problem.id %}" class="btn btn-danger btn-sm">Delete</a>
+                    <form method="post" class="d-flex align-items-end gap-3">
+                        {% csrf_token %}
+                        <div class="flex-grow-1">
+                            <label class="form-label mb-1 text-muted">{{ form.user_answer.label }}</label>
+                            {% render_field form.user_answer %}
+                            {% if form.user_answer.errors %}
+                                <div class="text-danger small mt-1">{{ form.user_answer.errors|join:", " }}</div>
+                            {% endif %}
+                        </div>
+                        <button type="submit" class="btn btn-primary px-4">Submit Answer</button>
+                    </form>
+                </div>
+                
+                {% if last_attempts %}
+                <div class="mt-4">
+                    <h6 class="text-muted mb-2">Your Recent Attempts</h6>
+                    <div class="d-flex flex-wrap gap-2">
+                        {% for attempt in last_attempts %}
+                        <span class="badge border {% if attempt.is_correct %}border-success text-success{% else %}border-danger text-danger{% endif %} p-2" style="background: rgba(0,0,0,0.2);">
+                            {{ attempt.user_answer }} 
+                            {% if attempt.is_correct %}✓{% else %}✗{% endif %}
+                        </span>
+                        {% endfor %}
+                    </div>
                 </div>
                 {% endif %}
             </div>
         </div>
-    </div>
-    
-    <div class="col-lg-4">
-        <div class="card p-2 mb-4" style="border-top: 4px solid var(--accent-primary);">
-            <div class="card-header">
-                <h5 class="mb-0">Submit Output</h5>
-            </div>
-            <div class="card-body">
-                <form method="post">
-                    {% csrf_token %}
-                    <div class="mb-3">
-                        <label class="form-label">{{ form.user_answer.label }}</label>
-                        {% render_field form.user_answer %}
-                        {% if form.user_answer.errors %}
-                            <div class="text-danger small mt-1">{{ form.user_answer.errors|join:", " }}</div>
-                        {% endif %}
-                    </div>
-                    <button type="submit" class="btn btn-primary w-100">Submit Answer</button>
-                </form>
-            </div>
-        </div>
-        
-        {% if last_attempts %}
-        <div class="card p-2">
-            <div class="card-header">
-                <h6 class="mb-0">Your Recent Attempts</h6>
-            </div>
-            <ul class="list-group list-group-flush" style="background: transparent;">
-                {% for attempt in last_attempts %}
-                <li class="list-group-item d-flex justify-content-between align-items-center" style="background: transparent; border-color: var(--glass-border); color: #fff;">
-                    <span>Answer: <strong class="{{ attempt.is_correct|yesno:'text-success,text-danger' }}">{{ attempt.user_answer }}</strong></span>
-                    <span class="badge {{ attempt.is_correct|yesno:'bg-success,bg-danger' }} rounded-pill">
-                        {{ attempt.is_correct|yesno:'✓,✗' }}
-                    </span>
-                </li>
-                {% endfor %}
-            </ul>
-        </div>
-        {% endif %}
     </div>
 </div>
 {% endblock %}

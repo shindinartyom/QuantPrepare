@@ -32,6 +32,11 @@ class Problem(models.Model):
         choices=DIFFICULTY_CHOICES,
         default='medium'
     )
+    tolerance = models.FloatField(
+        'Tolerance (margin of error)',
+        default=0.01,
+        help_text="Allowed difference for float numerical answers"
+    )
     created_at = models.DateTimeField('Creation Date', auto_now_add=True)
     author = models.ForeignKey(
         User, 

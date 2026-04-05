@@ -52,7 +52,7 @@ class ProblemDetailView(LoginRequiredMixin, DetailView):
         
         if form.is_valid():
             user_answer = form.cleaned_data['user_answer']
-            is_correct = abs(user_answer - self.object.correct_answer) < 0.0001
+            is_correct = abs(user_answer - self.object.correct_answer) <= self.object.tolerance
             
             Attempt.objects.create(
                 problem=self.object,
@@ -85,10 +85,8 @@ class ProblemCreateView(LoginRequiredMixin, CreateView):
         form.instance.author = self.request.user
         response = super().form_valid(form)
         
-        # Handle tags
         tags_input = form.cleaned_data.get('tags_input', '')
         if tags_input:
-            # simple split by comma or space
             raw_tags = tags_input.replace(',', ' ').split()
             for t in raw_tags:
                 tag_name = t.strip().lower()
@@ -99,52 +97,7 @@ class ProblemCreateView(LoginRequiredMixin, CreateView):
         messages.success(self.request, f'Problem "{form.instance.title}" was successfully created!')
         return response
 
-class ProblemUpdateView(LoginRequiredMixin, UserPassesTestMixin, UpdateView):
-    model = Problem
-    form_class = ProblemForm
-    template_name = 'problems/problem_form.html'
-    success_url = reverse_lazy('problems:problem_list')
-    
-    def test_func(self):
-        obj = self.get_object()
-        return obj.author == self.request.user
-    
-    def get_initial(self):
-        initial = super().get_initial()
-        # populate tags_input
-        initial['tags_input'] = " ".join([t.name for t in self.object.tags.all()])
-        return initial
 
-    def form_valid(self, form):
-        response = super().form_valid(form)
-        
-        # update tags
-        tags_input = form.cleaned_data.get('tags_input', '')
-        self.object.tags.clear()
-        if tags_input:
-            raw_tags = tags_input.replace(',', ' ').split()
-            for t in raw_tags:
-                tag_name = t.strip().lower()
-                if tag_name:
-                    tag_obj, _ = Tag.objects.get_or_create(name=tag_name)
-                    self.object.tags.add(tag_obj)
-                    
-        messages.success(self.request, f'Problem "{form.instance.title}" was updated!')
-        return response
-
-class ProblemDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
-    model = Problem
-    template_name = 'problems/problem_confirm_delete.html'
-    success_url = reverse_lazy('problems:problem_list')
-
-    def test_func(self):
-        obj = self.get_object()
-        return obj.author == self.request.user
-    
-    def delete(self, request, *args, **kwargs):
-        problem = self.get_object()
-        messages.success(request, f'Problem "{problem.title}" was deleted!')
-        return super().delete(request, *args, **kwargs)
 
 class StatisticsView(LoginRequiredMixin, TemplateView):
     template_name = 'problems/statistics.html'
@@ -152,7 +105,6 @@ class StatisticsView(LoginRequiredMixin, TemplateView):
     def get_context_data(self, **kwargs):
         context = super().get_context_data(**kwargs)
         
-        # Get query parameters for filtering
         search_q = self.request.GET.get('search', '')
         difficulty_q = self.request.GET.get('difficulty', '')
         tag_q = self.request.GET.get('theme', '')
@@ -173,7 +125,6 @@ class StatisticsView(LoginRequiredMixin, TemplateView):
         context['correct_attempts'] = correct_attempts
         context['accuracy'] = round(correct_attempts / total_attempts * 100, 1) if total_attempts > 0 else 0
         
-        # get last 50 filtered attempts
         context['recent_attempts'] = user_attempts.order_by('-timestamp')[:50]
         context['search'] = search_q
         context['difficulty'] = difficulty_q
